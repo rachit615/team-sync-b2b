@@ -3,6 +3,8 @@ export const getEnv = (key: string, defaultValue?: string) => {
   if (value === undefined) {
     if (defaultValue) {
       return defaultValue;
+    } else {
+      return "jfdlfdf";
     }
     throw new Error(`Environment variable ${key} is not defined`);
   }
