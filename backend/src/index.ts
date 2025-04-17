@@ -1,9 +1,12 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { config } from "./config/app.config";
 import session from "cookie-session";
 import connectDB from "./config/database.config";
+import { HTTP_STATUS } from "./config/http.config";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
+import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 
 dotenv.config();
 
@@ -24,6 +27,15 @@ app.use(
   })
 );
 app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
+
+app.get(
+  "/",
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    res.status(HTTP_STATUS.OK).json({ message: "Welcome to the API" });
+  })
+);
+// errorHandler middleware to be placed after all routes
+app.use(errorHandler);
 
 app.listen(config.PORT, async () => {
   console.log(
