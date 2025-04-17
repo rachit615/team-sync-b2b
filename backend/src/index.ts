@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { config } from "./config/app.config";
 import session from "cookie-session";
+import connectDB from "./config/database.config";
 
 dotenv.config();
 
@@ -24,8 +25,9 @@ app.use(
 );
 app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
 
-app.listen(config.PORT, () => {
+app.listen(config.PORT, async () => {
   console.log(
     `Server is running on port ${config.PORT} in ${config.NODE_ENV} mode`
   );
+  await connectDB();
 });
