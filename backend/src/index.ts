@@ -7,6 +7,10 @@ import connectDB from "./config/database.config";
 import { HTTP_STATUS } from "./config/http.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
+import passport from "passport";
+
+import "./config/passport.config";
+import authRoutes from "./routes/auth.route";
 
 dotenv.config();
 
@@ -26,6 +30,9 @@ app.use(
     sameSite: "lax",
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
 
 app.get(
@@ -34,6 +41,9 @@ app.get(
     res.status(HTTP_STATUS.OK).json({ message: "Welcome to the API" });
   })
 );
+
+app.use(`${BASE_PATH}/auth`, authRoutes);
+
 // errorHandler middleware to be placed after all routes
 app.use(errorHandler);
 

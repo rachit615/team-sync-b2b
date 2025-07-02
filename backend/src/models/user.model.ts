@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import { compareValue, hashValue } from "../utils/bcrypt";
 
 export interface UserDocument extends Document {
@@ -17,7 +17,11 @@ export interface UserDocument extends Document {
 
 const userSchema = new Schema<UserDocument>(
   {
-    name: { type: String, required: true, trim: true },
+    name: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -25,24 +29,28 @@ const userSchema = new Schema<UserDocument>(
       trim: true,
       lowercase: true,
     },
-    password: { type: String, required: true, select: false },
-    profilePicture: { type: String, default: null },
-    isActive: { type: Boolean, default: true },
-    lastLogin: { type: Date, default: null },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    password: { type: String, select: true },
+    profilePicture: {
+      type: String,
+      default: null,
+    },
     currentWorkspace: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Workspace",
     },
+    isActive: { type: Boolean, default: true },
+    lastLogin: { type: Date, default: null },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  if (this.password) {
-    this.password = await hashValue(this.password);
+  if (this.isModified("password")) {
+    if (this.password) {
+      this.password = await hashValue(this.password);
+    }
   }
   next();
 });
@@ -54,7 +62,7 @@ userSchema.methods.omitPassword = function (): Omit<UserDocument, "password"> {
 };
 
 userSchema.methods.comparePassword = async function (value: string) {
-  return await compareValue(value, this.password);
+  return compareValue(value, this.password);
 };
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);

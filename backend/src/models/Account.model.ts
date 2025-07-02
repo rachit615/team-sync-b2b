@@ -19,7 +19,7 @@ const accountSchema = new Schema<AccountDocument>(
     },
     providerId: { type: String, required: true, unique: true },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -40,3 +40,4 @@ export const AccountModel = mongoose.model<AccountDocument>(
   "Account",
   accountSchema
 );
+export default AccountModel;
