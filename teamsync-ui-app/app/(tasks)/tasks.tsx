@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { TabMenuProps } from "@/interfaces/interface";
 import TaskCard from "@/components/Task/TaskCard";
+import Button from "@/components/Common/Button/Button";
 
 const tabData = [
   {
@@ -69,11 +70,16 @@ export default function TasksScreen() {
         },
       ],
     },
-    // You can add more tasks here
   ];
 
   return (
-    <View style={{ padding: 20 }}>
+    <View
+      style={{
+        padding: 20,
+        position: "relative",
+        height: "100%",
+      }}
+    >
       <View style={styles.tabContainer}>
         <TabMenu
           tabs={tabData}
@@ -83,6 +89,9 @@ export default function TasksScreen() {
       </View>
       <Text style={{ marginTop: 20 }}>Current tab: {selectedTab}</Text>
       <TaskCard task={tasks[0]} />
+      <View style={styles.addTask}>
+        <Button BtnText={"Add Task"} onButtonClick={() => {}} />
+      </View>
     </View>
   );
 }
@@ -113,5 +122,13 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: "#FFFFFF",
+  },
+  addTask: {
+    position: "absolute",
+    bottom: 20,
+    width: "100%",
+    left: 20,
+    right: 20,
+    alignItems: "center",
   },
 });
