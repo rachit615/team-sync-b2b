@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { TabMenuProps } from "@/interfaces/interface";
 import TaskCard from "@/components/Task/TaskCard";
 import Button from "@/components/Common/Button/Button";
+import { router } from "expo-router";
 
 const tabData = [
   {
@@ -90,7 +91,12 @@ export default function TasksScreen() {
       <Text style={{ marginTop: 20 }}>Current tab: {selectedTab}</Text>
       <TaskCard task={tasks[0]} />
       <View style={styles.addTask}>
-        <Button BtnText={"Add Task"} onButtonClick={() => {}} />
+        <Button
+          BtnText={"Add Task"}
+          onButtonClick={() => {
+            router.push("/(tasks)/createNewTask");
+          }}
+        />
       </View>
     </View>
   );
