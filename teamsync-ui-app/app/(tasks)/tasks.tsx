@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Touchable,
+} from "react-native";
 import { TabMenuProps } from "@/interfaces/interface";
 import TaskCard from "@/components/Task/TaskCard";
 import Button from "@/components/Common/Button/Button";
@@ -89,7 +95,9 @@ export default function TasksScreen() {
         />
       </View>
       <Text style={{ marginTop: 20 }}>Current tab: {selectedTab}</Text>
-      <TaskCard task={tasks[0]} />
+      <TouchableOpacity onPress={() => router.push("/(tasks)/taskDetail")}>
+        <TaskCard task={tasks[0]} />
+      </TouchableOpacity>
       <View style={styles.addTask}>
         <Button
           BtnText={"Add Task"}
