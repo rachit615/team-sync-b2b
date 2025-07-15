@@ -1,4 +1,5 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   StyleSheet,
   Text,
@@ -10,8 +11,8 @@ import {
 export default function RegisterScreen() {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backBtn}>
-        <Ionicons name="arrow-back" size={24} color="#0057FF" />
+      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={20} color="#fff" />
       </TouchableOpacity>
 
       <Text style={styles.title}>Team Sync</Text>
@@ -77,8 +78,20 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center" },
-  backBtn: { position: "absolute", top: 50, left: 20 },
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  backBtn: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    backgroundColor: "#0057FF",
+    borderRadius: 5,
+    padding: 6,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",

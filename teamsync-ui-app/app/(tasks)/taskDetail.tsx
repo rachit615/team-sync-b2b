@@ -6,21 +6,22 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  Switch,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ProgressBar } from "react-native-paper"; // Install if not already
+import ScreenHeader from "@/components/Common/ScreenHeader/ScreenHeader";
+import { router } from "expo-router";
 
 export default function TaskDetailScreen() {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Task Details</Text>
-        <Ionicons name="notifications-outline" size={22} color="#000" />
-      </View>
+      <ScreenHeader
+        headerTitle="Task Details"
+        leftIcon="arrow-back"
+        rightIcon="notifications-outline"
+        headerStyle={styles.header}
+        leftIconPress={() => router.back()}
+      />
 
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
         <View style={styles.row}>
@@ -144,12 +145,8 @@ export default function TaskDetailScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 20,
-    justifyContent: "space-between",
-    borderBottomColor: "#eee",
-    borderBottomWidth: 1,
+    marginTop: 20,
+    marginBottom: 0,
   },
   headerTitle: { fontSize: 16, fontWeight: "600", color: "#000" },
   row: {

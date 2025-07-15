@@ -1,3 +1,4 @@
+import AvatarGroup from "@/components/Common/AvatarGroup/AvatarGroup";
 import { workspaceData } from "@/constants/data";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -9,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AvatarGroup from "@/components/Common/AvatarGroup/AvatarGroup";
 
 export default function WorkspaceScreen() {
   const getStatusBG = (taskStatus: string) => {
@@ -100,7 +100,7 @@ export default function WorkspaceScreen() {
 
         <View style={styles.section}>
           <Text style={styles.overviewHeader}>Project Overview (6)</Text>
-          {workspaceData.projectOverview.map((item, idx) => (
+          {workspaceData.projectOverview.map((item) => (
             <TouchableOpacity
               key={item.id}
               onPress={() => router.push("/(tasks)/tasks")}

@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     marginVertical: 10,
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
   rowBetween: {
     flexDirection: "row",

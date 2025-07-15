@@ -10,6 +10,7 @@ import { TabMenuProps } from "@/interfaces/interface";
 import TaskCard from "@/components/Task/TaskCard";
 import Button from "@/components/Common/Button/Button";
 import { router } from "expo-router";
+import ScreenHeader from "@/components/Common/ScreenHeader/ScreenHeader";
 
 const tabData = [
   {
@@ -80,13 +81,8 @@ export default function TasksScreen() {
   ];
 
   return (
-    <View
-      style={{
-        padding: 20,
-        position: "relative",
-        height: "100%",
-      }}
-    >
+    <View style={styles.container}>
+      <ScreenHeader headerTitle="Tasks" />
       <View style={styles.tabContainer}>
         <TabMenu
           tabs={tabData}
@@ -111,6 +107,12 @@ export default function TasksScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    position: "relative",
+    height: "100%",
+    backgroundColor: "#fff",
+  },
   tabContainer: {
     flexDirection: "row",
     borderRadius: 8,

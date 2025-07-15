@@ -1,6 +1,7 @@
 import Button from "@/components/Common/Button/Button";
 import DateCard from "@/components/Common/DateCard/DateCard";
 import PriorityLabel from "@/components/Common/PriorityLabel/PriorityLabel";
+import ScreenHeader from "@/components/Common/ScreenHeader/ScreenHeader";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { router, useLocalSearchParams } from "expo-router";
@@ -77,6 +78,12 @@ export default function CreateNewTask() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
+      <ScreenHeader
+        headerTitle="Create new task"
+        leftIcon="close"
+        leftIconPress={() => router.back()}
+        headerStyle={styles.header}
+      />
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
         <View
           style={{
@@ -208,6 +215,10 @@ const styles = StyleSheet.create({
   priorityContainer: {
     flexDirection: "row",
     marginBottom: 20,
+  },
+  header: {
+    marginTop: 20,
+    marginBottom: 0,
   },
   title: {
     marginBottom: 10,
