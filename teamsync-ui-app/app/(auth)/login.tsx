@@ -1,5 +1,6 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, router, useNavigation } from "expo-router";
+import { useLayoutEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,6 +12,9 @@ import {
 export default function LoginScreen() {
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={20} color="#fff" />
+      </TouchableOpacity>
       <Text style={styles.title}>Team Sync</Text>
       <Text style={styles.subtitle}>Management App</Text>
 
@@ -43,7 +47,10 @@ export default function LoginScreen() {
         <Text style={{ color: "#0057FF", fontSize: 12 }}>Forgot password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.primaryBtn}>
+      <TouchableOpacity
+        style={styles.primaryBtn}
+        onPress={() => router.push("/(workspace)/workspace")}
+      >
         <Text style={styles.primaryBtnText}>Login</Text>
       </TouchableOpacity>
 
@@ -66,7 +73,20 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center" },
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  backBtn: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    backgroundColor: "#0057FF",
+    borderRadius: 5,
+    padding: 6,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",

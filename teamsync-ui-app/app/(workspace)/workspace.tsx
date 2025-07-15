@@ -1,12 +1,15 @@
 import { workspaceData } from "@/constants/data";
 import { Entypo, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import AvatarGroup from "@/components/Common/AvatarGroup/AvatarGroup";
 
 export default function WorkspaceScreen() {
   const getStatusBG = (taskStatus: string) => {
@@ -32,15 +35,25 @@ export default function WorkspaceScreen() {
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
+          <Image
+            source={{
+              uri: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=60&q=60",
+            }}
+            style={[styles.memberAvatar]}
+          />
           <Text style={styles.headerTitle}>Your Workspace’s</Text>
           <Entypo name="menu" size={22} />
         </View>
 
         {/* Tabs */}
-        <View style={styles.tabs}>
+        <ScrollView
+          style={styles.tabs}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
           {["All", "Recents", "Personal", "Teams", "Assigned"].map(
             (tab, idx) => (
-              <TouchableOpacity key={idx}>
+              <TouchableOpacity key={idx} style={styles.tab}>
                 <Text
                   style={[
                     styles.tabText,
@@ -52,13 +65,15 @@ export default function WorkspaceScreen() {
               </TouchableOpacity>
             )
           )}
-        </View>
+        </ScrollView>
 
         <View style={styles.section}>
           {workspaceData.featured.map((item) => (
             <View key={item.id} style={styles.featuredCard}>
               <View style={styles.cardHeader}>
-                <Text>{item.priority}</Text>
+                <View style={[styles.statusLabel, getStatusBG("High")]}>
+                  <Text style={getStatusColor("High")}>High</Text>
+                </View>
                 <Ionicons
                   name="ellipsis-vertical-sharp"
                   size={16}
@@ -66,14 +81,19 @@ export default function WorkspaceScreen() {
                 />
               </View>
               <Text style={styles.featuredTitle}>{item.title}</Text>
-              <Text style={styles.featuredSubtitle}>in {item.category}</Text>
-              <View style={styles.avatars}>
-                {item.team.map((_, i) => (
-                  <Text key={i} style={styles.avatar}>
-                    👤
-                  </Text>
-                ))}
-              </View>
+              <Text style={styles.featuredDate}>Aug 12, 2024</Text>
+              <AvatarGroup
+                members={[
+                  {
+                    avatar:
+                      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=60&q=60",
+                  },
+                  {
+                    avatar:
+                      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=60&q=60",
+                  },
+                ]}
+              />
             </View>
           ))}
         </View>
@@ -81,20 +101,25 @@ export default function WorkspaceScreen() {
         <View style={styles.section}>
           <Text style={styles.overviewHeader}>Project Overview (6)</Text>
           {workspaceData.projectOverview.map((item, idx) => (
-            <View key={idx} style={styles.projectRow}>
-              <View>
-                <View style={styles.titleRow}>
-                  <View style={styles.circle}></View>
-                  <Text style={styles.projectTitle}>{item.title}</Text>
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => router.push("/(tasks)/tasks")}
+            >
+              <View style={styles.projectRow}>
+                <View>
+                  <View style={styles.titleRow}>
+                    <View style={styles.circle}></View>
+                    <Text style={styles.projectTitle}>{item.title}</Text>
+                  </View>
+                  <Text style={styles.projectMeta}>
+                    {item.tasks} | {item.due}
+                  </Text>
                 </View>
-                <Text style={styles.projectMeta}>
-                  {item.tasks} | {item.due}
-                </Text>
+                <View style={[styles.statusLabel, getStatusBG(item.status)]}>
+                  <Text style={getStatusColor(item.status)}>{item.status}</Text>
+                </View>
               </View>
-              <View style={[styles.statusLabel, getStatusBG(item.status)]}>
-                <Text style={getStatusColor(item.status)}>{item.status}</Text>
-              </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </View>
@@ -105,7 +130,8 @@ export default function WorkspaceScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    padding: 20,
+    paddingTop: 40,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
   },
@@ -128,8 +154,17 @@ const styles = StyleSheet.create({
   },
   tabs: {
     flexDirection: "row",
-    gap: 16,
     marginVertical: 16,
+    paddingHorizontal: 16,
+  },
+  tab: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 10,
+    paddingTop: 2,
+    paddingBottom: 2,
+    paddingLeft: 8,
+    paddingRight: 8,
+    marginRight: 10,
   },
   titleRow: {
     flexDirection: "row",
@@ -143,9 +178,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#FF69B4",
   },
+  memberAvatar: {
+    width: 35,
+    height: 35,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "white",
+  },
   tabText: {
     fontSize: 14,
-    color: "#999",
   },
   tabActive: {
     color: "#000",
@@ -156,10 +197,11 @@ const styles = StyleSheet.create({
   },
 
   featuredCard: {
-    borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    elevation: 3,
+    borderWidth: 1,
+    borderRadius: 20,
+    borderColor: "#EEF5FD",
   },
   cardHeader: {
     flexDirection: "row",
@@ -175,6 +217,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 4,
+  },
+  featuredDate: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 10,
   },
   featuredSubtitle: {
     fontSize: 12,
@@ -197,9 +244,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 12,
-    borderRadius: 8,
     marginBottom: 10,
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    borderWidth: 1,
+    borderRadius: 20,
+    borderColor: "#EEF5FD",
   },
   projectTitle: {
     fontWeight: "600",

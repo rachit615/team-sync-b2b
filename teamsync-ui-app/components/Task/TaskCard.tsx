@@ -1,8 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AvatarGroup from "../Common/AvatarGroup/AvatarGroup";
 
-const TaskCard = ({ task }) => {
+const TaskCard = ({ task }: any) => {
   return (
     <View style={styles.card}>
       {/* Top Row: Date and Priority */}
@@ -38,21 +40,7 @@ const TaskCard = ({ task }) => {
       </View>
 
       <View style={styles.bottomRow}>
-        <View style={styles.avatarGroup}>
-          {task.members.slice(0, 2).map((member, index) => (
-            <Image
-              key={index}
-              source={{ uri: member.avatar }}
-              style={[
-                styles.memberAvatar,
-                { marginLeft: index === 0 ? 0 : -10 },
-              ]}
-            />
-          ))}
-          <View style={styles.moreAvatar}>
-            <Text style={styles.moreText}>+{task.members.length - 2}</Text>
-          </View>
-        </View>
+        <AvatarGroup members={task.members} />
 
         <View style={styles.rowCenter}>
           <View style={styles.iconBadge}>
@@ -65,7 +53,9 @@ const TaskCard = ({ task }) => {
               size={16}
               color="#4B5563"
             />
-            <Text style={styles.iconText}>{task.comments}</Text>
+            <TouchableOpacity onPress={() => router.push("/(tasks)/comments")}>
+              <Text style={styles.iconText}>{task.comments}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
