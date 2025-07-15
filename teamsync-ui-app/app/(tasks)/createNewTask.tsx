@@ -7,6 +7,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,19 +15,30 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function CreateNewTask() {
   const params = useLocalSearchParams();
+
+  const [taskData, setTaskData] = useState({
+    taskName: "",
+    taskDescription: "",
+    taskPriority: "",
+    taskStartDate: "",
+    taskDueDate: "",
+    taskAssignedUsers: [],
+    taskFiles: [],
+  });
+
   const [files, setFiles] = useState<{ name: string; uri: string }[]>([]);
   const [assignedUsers, setAssignedUsers] = useState<string[]>([
     "Buhgalter",
     "Merdan K.",
     "Maysa G.",
   ]);
-  const [taskName, setTaskName] = useState("");
-  const [description, setDescription] = useState("");
-
-  console.log("params.selectedUsers :>> ", params);
+  const [showDatePicker, setShowDatePicker] = useState<{
+    mode: "start" | "due" | null;
+  }>({ mode: null });
 
   useEffect(() => {
     const selectedUsersString = params.selectedUsers as string | undefined;
@@ -35,17 +47,22 @@ export default function CreateNewTask() {
       const newSelectedUsers = selectedUsersString
         .split(",")
         .filter((name) => name.trim() !== "");
-
       const uniqueNewUsers = newSelectedUsers.filter(
         (user) => !assignedUsers.includes(user)
       );
 
       if (uniqueNewUsers.length > 0) {
-        setAssignedUsers((prev) => [...prev, ...uniqueNewUsers]);
+        const updatedUsers = [...assignedUsers, ...uniqueNewUsers];
+        setAssignedUsers(updatedUsers);
+        handleChangeTask("taskAssignedUsers", updatedUsers);
       }
       router.setParams({ selectedUsers: undefined });
     }
   }, [params.selectedUsers]);
+
+  const handleChangeTask = (key: string, value: any) => {
+    setTaskData((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleUpload = async () => {
     const result = await DocumentPicker.getDocumentAsync({ multiple: true });
@@ -55,12 +72,16 @@ export default function CreateNewTask() {
         name: file.name,
         uri: file.uri,
       }));
-      setFiles((prev) => [...prev, ...newFiles]);
+      const updatedFiles = [...files, ...newFiles];
+      setFiles(updatedFiles);
+      handleChangeTask("taskFiles", updatedFiles);
     }
   };
 
   const removeFile = (fileName: string) => {
-    setFiles((prev) => prev.filter((file) => file.name !== fileName));
+    const updatedFiles = files.filter((file) => file.name !== fileName);
+    setFiles(updatedFiles);
+    handleChangeTask("taskFiles", updatedFiles);
   };
 
   const handleAddUser = () => {
@@ -71,10 +92,10 @@ export default function CreateNewTask() {
   };
 
   const handleRemoveUser = (name: string) => {
-    setAssignedUsers((prev) => prev.filter((user) => user !== name));
+    const updatedUsers = assignedUsers.filter((user) => user !== name);
+    setAssignedUsers(updatedUsers);
+    handleChangeTask("taskAssignedUsers", updatedUsers);
   };
-
-  console.log("files :>> ", files);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -84,128 +105,182 @@ export default function CreateNewTask() {
         leftIconPress={() => router.back()}
         headerStyle={styles.header}
       />
+
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
-        <View
-          style={{
-            backgroundColor: "white",
-          }}
-        >
-          <Text style={styles.title}>Task Type</Text>
-          <View style={styles.priorityContainer}>
-            <PriorityLabel text="Low" bgColor="#D5F2D7" textColor="#228B22" />
-            <PriorityLabel
-              text="Medium"
-              bgColor="#FDE9CC"
-              textColor="#C77D00"
-            />
-            <PriorityLabel text="High" bgColor="#FFD1D6" textColor="#D72638" />
-            <PriorityLabel
-              text="Urgent"
-              bgColor="#D3D3D3"
-              textColor="#4B4B4B"
-            />
-          </View>
-          <Text style={styles.title}>Choose Date</Text>
-          <View style={styles.dateSelect}>
-            <DateCard label="Start Date" dateTime="10.08.2023 / 10:00" />
-            <DateCard label="Due Date" dateTime="18.08.2023 / 18:45" />
-          </View>
-          <View style={styles.uploadFile}>
-            <Text style={styles.title}>Upload File</Text>
-            <View style={styles.uploadContainer}>
+        <Text style={styles.title}>Task Type</Text>
+        <View style={styles.priorityContainer}>
+          {["Low", "Medium", "High", "Urgent"].map((priority) => {
+            const colorMap = {
+              Low: "#228B22",
+              Medium: "#C77D00",
+              High: "#D72638",
+              Urgent: "#4B4B4B",
+            };
+            const bgMap = {
+              Low: "#D5F2D7",
+              Medium: "#FDE9CC",
+              High: "#FFD1D6",
+              Urgent: "#D3D3D3",
+            };
+            return (
               <TouchableOpacity
-                style={styles.uploadButton}
-                onPress={handleUpload}
+                key={priority}
+                onPress={() => handleChangeTask("taskPriority", priority)}
               >
-                <Ionicons name="cloud-upload-outline" size={16} color="white" />
-                <Text style={styles.uploadButtonText}>Upload</Text>
+                <PriorityLabel
+                  text={priority}
+                  bgColor={
+                    taskData.taskPriority === priority
+                      ? bgMap[priority]
+                      : "#f0f0f0"
+                  }
+                  textColor={
+                    taskData.taskPriority === priority
+                      ? colorMap[priority]
+                      : "#999"
+                  }
+                />
               </TouchableOpacity>
+            );
+          })}
+        </View>
 
-              <View style={styles.fileList}>
-                {files.map((file, index) => (
-                  <View key={index} style={styles.filePill}>
-                    <View style={styles.fileIconBg}>
-                      <Ionicons
-                        name="document-outline"
-                        size={14}
-                        color="#555"
-                      />
-                    </View>
-                    <Text style={styles.fileName}>{file.name}</Text>
-                    <TouchableOpacity onPress={() => removeFile(file.name)}>
-                      <Ionicons name="close" size={14} color="#555" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </View>
+        <Text style={styles.title}>Choose Date</Text>
+        <View style={styles.dateSelect}>
+          <DateCard
+            label="Start Date"
+            dateTime={taskData.taskStartDate || "--"}
+            onPress={() => {
+              setShowDatePicker({ mode: "start" });
+            }}
+          />
 
-          <View style={styles.assignedUsers}>
-            <Text style={styles.title}>Assigned users</Text>
-            <View style={styles.userList}>
-              <TouchableOpacity
-                style={styles.addUserBtn}
-                onPress={handleAddUser}
-              >
-                <Ionicons name="add" size={16} color="white" />
-                <Text style={styles.addUserText}>Add</Text>
-              </TouchableOpacity>
+          <DateCard
+            label="Due Date"
+            dateTime={taskData.taskDueDate || "--"}
+            onPress={() => {
+              setShowDatePicker({ mode: "due" });
+            }}
+          />
+        </View>
 
-              {assignedUsers?.map((user, index) => {
-                const initials = user
-                  .split(" ")
-                  .map((part) => part[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase();
-
-                return (
-                  <View key={index} style={styles.userPill}>
-                    <View style={styles.userInitials}>
-                      <Text
-                        style={{
-                          color: "#292A2D",
-                          fontSize: 10,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {initials}
-                      </Text>
-                    </View>
-                    <Text style={styles.userName}>{user}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveUser(user)}>
-                      <Ionicons name="close" size={14} color="#555" />
-                    </TouchableOpacity>
-                  </View>
+        {showDatePicker.mode && (
+          <DateTimePicker
+            value={new Date()}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker({ mode: null });
+              if (selectedDate) {
+                const formattedDate = `${selectedDate
+                  .getDate()
+                  .toString()
+                  .padStart(2, "0")}.${(selectedDate.getMonth() + 1)
+                  .toString()
+                  .padStart(2, "0")}.${selectedDate.getFullYear()}`;
+                handleChangeTask(
+                  showDatePicker.mode === "start"
+                    ? "taskStartDate"
+                    : "taskDueDate",
+                  formattedDate
                 );
-              })}
-            </View>
-          </View>
+              }
+            }}
+          />
+        )}
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Task name"
-              placeholderTextColor="#999"
-              style={styles.input}
-              value={taskName}
-              onChangeText={setTaskName}
-            />
-            <TextInput
-              placeholder="Description"
-              placeholderTextColor="#999"
-              style={[styles.input, styles.descriptionInput]}
-              value={description}
-              onChangeText={setDescription}
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-            />
+        <View style={styles.uploadFile}>
+          <Text style={styles.title}>Upload File</Text>
+          <View style={styles.uploadContainer}>
+            <TouchableOpacity
+              style={styles.uploadButton}
+              onPress={handleUpload}
+            >
+              <Ionicons name="cloud-upload-outline" size={16} color="white" />
+              <Text style={styles.uploadButtonText}>Upload</Text>
+            </TouchableOpacity>
+
+            <View style={styles.fileList}>
+              {files.map((file, index) => (
+                <View key={index} style={styles.filePill}>
+                  <View style={styles.fileIconBg}>
+                    <Ionicons name="document-outline" size={14} color="#555" />
+                  </View>
+                  <Text style={styles.fileName}>{file.name}</Text>
+                  <TouchableOpacity onPress={() => removeFile(file.name)}>
+                    <Ionicons name="close" size={14} color="#555" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
           </View>
         </View>
+
+        <View style={styles.assignedUsers}>
+          <Text style={styles.title}>Assigned users</Text>
+          <View style={styles.userList}>
+            <TouchableOpacity style={styles.addUserBtn} onPress={handleAddUser}>
+              <Ionicons name="add" size={16} color="white" />
+              <Text style={styles.addUserText}>Add</Text>
+            </TouchableOpacity>
+
+            {assignedUsers.map((user, index) => {
+              const initials = user
+                .split(" ")
+                .map((part) => part[0])
+                .join("".slice(0, 2))
+                .toUpperCase();
+              return (
+                <View key={index} style={styles.userPill}>
+                  <View style={styles.userInitials}>
+                    <Text
+                      style={{
+                        color: "#292A2D",
+                        fontSize: 10,
+                        fontWeight: "600",
+                      }}
+                    >
+                      {initials}
+                    </Text>
+                  </View>
+                  <Text style={styles.userName}>{user}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveUser(user)}>
+                    <Ionicons name="close" size={14} color="#555" />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Task name"
+            placeholderTextColor="#999"
+            style={styles.input}
+            value={taskData.taskName}
+            onChangeText={(text) => handleChangeTask("taskName", text)}
+          />
+          <TextInput
+            placeholder="Description"
+            placeholderTextColor="#999"
+            style={[styles.input, styles.descriptionInput]}
+            value={taskData.taskDescription}
+            onChangeText={(text) => handleChangeTask("taskDescription", text)}
+            multiline
+            numberOfLines={5}
+            textAlignVertical="top"
+          />
+        </View>
       </ScrollView>
+
       <View style={styles.addTaskBtmBtnWrapper}>
-        <Button BtnText="Add task" onButtonClick={() => {}} />
+        <Button
+          BtnText="Add task"
+          onButtonClick={() => {
+            console.log("Final taskData :>> ", taskData);
+          }}
+        />
       </View>
     </View>
   );

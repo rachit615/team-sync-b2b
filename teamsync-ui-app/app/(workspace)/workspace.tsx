@@ -53,7 +53,10 @@ export default function WorkspaceScreen() {
         >
           {["All", "Recents", "Personal", "Teams", "Assigned"].map(
             (tab, idx) => (
-              <TouchableOpacity key={idx} style={styles.tab}>
+              <TouchableOpacity
+                key={idx}
+                style={[styles.tab, tab === "Recents" && styles.activeTabBg]}
+              >
                 <Text
                   style={[
                     styles.tabText,
@@ -166,6 +169,9 @@ const styles = StyleSheet.create({
     paddingRight: 8,
     marginRight: 10,
   },
+  activeTabBg: {
+    backgroundColor: "#0057FF",
+  },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -189,8 +195,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   tabActive: {
-    color: "#000",
-    fontWeight: "bold",
+    color: "#fff",
   },
   section: {
     marginBottom: 20,
