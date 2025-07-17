@@ -33,7 +33,8 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
+// For mobile device for temporary use added for testing
+app.use(cors({ origin: true, credentials: true }));
 
 app.get(
   "/",
