@@ -3,6 +3,7 @@ import DateCard from "@/components/Common/DateCard/DateCard";
 import PriorityLabel from "@/components/Common/PriorityLabel/PriorityLabel";
 import ScreenHeader from "@/components/Common/ScreenHeader/ScreenHeader";
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as DocumentPicker from "expo-document-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -15,20 +16,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store";
+import { updateTaskFormData } from "../store/taskFormSlice";
 
 export default function CreateNewTask() {
   const params = useLocalSearchParams();
 
-  const [taskData, setTaskData] = useState({
-    taskName: "",
-    taskDescription: "",
-    taskPriority: "",
-    taskStartDate: "",
-    taskDueDate: "",
-    taskAssignedUsers: [],
-    taskFiles: [],
-  });
+  const dispatch = useDispatch();
+  const taskData = useSelector((state: RootState) => state.taskForm);
 
   const [files, setFiles] = useState<{ name: string; uri: string }[]>([]);
   const [assignedUsers, setAssignedUsers] = useState<string[]>([
@@ -60,8 +56,8 @@ export default function CreateNewTask() {
     }
   }, [params.selectedUsers]);
 
-  const handleChangeTask = (key: string, value: any) => {
-    setTaskData((prev) => ({ ...prev, [key]: value }));
+  const handleChangeTask = (key: keyof typeof taskData, value: any) => {
+    dispatch(updateTaskFormData({ key, value }));
   };
 
   const handleUpload = async () => {
