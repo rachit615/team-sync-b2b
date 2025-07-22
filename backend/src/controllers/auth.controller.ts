@@ -2,8 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { config } from "../config/app.config";
 import { HTTP_STATUS } from "../config/http.config";
-import { registerUserService } from "../services/auth.service";
-import passport from "passport";
+import {
+  registerUserService,
+  verifyUserService,
+} from "../services/auth.service";
+// import passport from "passport";
+import jwt from "jsonwebtoken";
 import { registerSchema } from "../validation/auth.validation";
 
 export const googleLoginCallback = asyncHandler(
@@ -37,36 +41,28 @@ export const registerUserController = asyncHandler(
 );
 
 export const loginController = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate(
-      "local",
-      (
-        err: Error | null,
-        user: Express.User | false,
-        info: { message: string } | undefined
-      ) => {
-        if (err) {
-          return next(err);
-        }
+  async (req: Request, res: Response) => {
+    const { email, password } = req.body;
 
-        if (!user) {
-          return res.status(HTTP_STATUS.UNAUTHORIZED).json({
-            message: info?.message || "Invalid email or password",
-          });
-        }
+    try {
+      const user = await verifyUserService({ email, password });
+      // signing off jwt toiken with info and jwt secret
+      const token = jwt.sign(
+        { id: user._id, email: user.email },
+        config.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
 
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
-          }
-
-          return res.status(HTTP_STATUS.OK).json({
-            message: "Logged in successfully",
-            user,
-          });
-        });
-      }
-    )(req, res, next);
+      return res.status(200).json({
+        message: "Logged in successfully",
+        token,
+        user,
+      });
+    } catch (error: any) {
+      return res.status(401).json({
+        message: error?.message || "Invalid email or password",
+      });
+    }
   }
 );
 

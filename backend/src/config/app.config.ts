@@ -19,6 +19,7 @@ const appConfig = () => {
       "FRONTEND_GOOGLE_CALLBACK_URL",
       "3000"
     ),
+    JWT_SECRET: getEnv("JWT_SECRET"),
   };
 };
 
