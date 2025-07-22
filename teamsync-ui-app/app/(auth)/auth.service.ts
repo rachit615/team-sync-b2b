@@ -5,7 +5,7 @@ export const AuthService = {
     return DataService.post("/auth/register", { data });
   },
   loginUser(data: any) {
-    return DataService.post("/auth/login", data);
+    return DataService.post("/auth/login", { data });
   },
   logOutUser() {
     return DataService.post("/auth/logout");

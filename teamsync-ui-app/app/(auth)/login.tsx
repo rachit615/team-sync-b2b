@@ -1,17 +1,45 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import { Link, router, useNavigation } from "expo-router";
-import { useLayoutEffect } from "react";
+import { Link, router } from "expo-router";
+import { useState } from "react";
 import {
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
+  Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthService } from "./auth.service";
 
 export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      return Alert.alert("Error", "Please enter email and password");
+    }
+
+    try {
+      const response = await AuthService.loginUser({ email, password });
+      console.log("response", response);
+      const { token, user } = response || {};
+
+      await AsyncStorage.setItem("token", token);
+      router.push("/(workspace)/workspace");
+    } catch (err: any) {
+      console.error("Login error:", err?.response?.data || err.message);
+      Alert.alert(
+        "Login Failed",
+        err?.response?.data?.message || "Something went wrong"
+      );
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={20} color="#fff" />
       </TouchableOpacity>
@@ -26,6 +54,9 @@ export default function LoginScreen() {
           placeholder="Email"
           keyboardType="email-address"
           style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
         />
       </View>
 
@@ -40,6 +71,8 @@ export default function LoginScreen() {
           placeholder="Password"
           secureTextEntry
           style={styles.input}
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
 
@@ -47,10 +80,7 @@ export default function LoginScreen() {
         <Text style={{ color: "#0057FF", fontSize: 12 }}>Forgot password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.primaryBtn}
-        onPress={() => router.push("/(workspace)/workspace")}
-      >
+      <TouchableOpacity style={styles.primaryBtn} onPress={() => handleLogin()}>
         <Text style={styles.primaryBtnText}>Login</Text>
       </TouchableOpacity>
 
@@ -68,7 +98,7 @@ export default function LoginScreen() {
           Sign Up
         </Link>
       </Text>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
