@@ -11,6 +11,8 @@ import passport from "passport";
 
 import "./config/passport.config";
 import authRoutes from "./routes/auth.route";
+import memberRoutes from "./routes/member.route";
+import workspaceRoutes from "./routes/workspace.route";
 
 dotenv.config();
 
@@ -44,6 +46,8 @@ app.get(
 );
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/member`, memberRoutes);
+app.use(`${BASE_PATH}/workspace`, workspaceRoutes);
 
 // errorHandler middleware to be placed after all routes
 app.use(errorHandler);
