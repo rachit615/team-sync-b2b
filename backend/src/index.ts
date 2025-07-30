@@ -13,6 +13,8 @@ import "./config/passport.config";
 import authRoutes from "./routes/auth.route";
 import memberRoutes from "./routes/member.route";
 import workspaceRoutes from "./routes/workspace.route";
+import projectRoutes from "./routes/project.route";
+import { authenticateJWT } from "./middlewares/auth.middleware";
 
 dotenv.config();
 
@@ -48,6 +50,7 @@ app.get(
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/member`, memberRoutes);
 app.use(`${BASE_PATH}/workspace`, workspaceRoutes);
+app.use(`${BASE_PATH}/project`, authenticateJWT, projectRoutes);
 
 // errorHandler middleware to be placed after all routes
 app.use(errorHandler);

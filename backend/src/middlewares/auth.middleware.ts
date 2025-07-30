@@ -6,7 +6,7 @@ export const authenticateJWT = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const authHeader = req.headers.authorization;
 
   if (authHeader?.startsWith("Bearer ")) {
@@ -14,11 +14,13 @@ export const authenticateJWT = (
     try {
       const decoded = jwt.verify(token, config.JWT_SECRET);
       (req as any).user = decoded;
-      return next();
+      next();
+      return;
     } catch (err) {
-      return res.status(403).json({ message: "Invalid token" });
+      res.status(403).json({ message: "Invalid token" });
+      return;
     }
   }
 
-  return res.status(401).json({ message: "Authorization token missing" });
+  res.status(401).json({ message: "Authorization token missing" });
 };
