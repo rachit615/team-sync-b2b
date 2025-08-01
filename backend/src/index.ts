@@ -15,6 +15,7 @@ import memberRoutes from "./routes/member.route";
 import workspaceRoutes from "./routes/workspace.route";
 import projectRoutes from "./routes/project.route";
 import { authenticateJWT } from "./middlewares/auth.middleware";
+import taskRoutes from "./routes/task.route";
 
 dotenv.config();
 
@@ -51,6 +52,7 @@ app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/member`, memberRoutes);
 app.use(`${BASE_PATH}/workspace`, workspaceRoutes);
 app.use(`${BASE_PATH}/project`, authenticateJWT, projectRoutes);
+app.use(`${BASE_PATH}/task`, authenticateJWT, taskRoutes);
 
 // errorHandler middleware to be placed after all routes
 app.use(errorHandler);
