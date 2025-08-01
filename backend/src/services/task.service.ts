@@ -1,4 +1,5 @@
 import TaskModel from "../models/task.model";
+import UserModel from "../models/user.model";
 import { NotFoundException } from "../utils/appError";
 
 interface CreateTaskInput {
@@ -14,6 +15,12 @@ interface CreateTaskInput {
 }
 
 export const createTaskService = async (data: CreateTaskInput) => {
+  if (data.assignedTo) {
+    const user = await UserModel.findById(data.assignedTo);
+    if (!user) {
+      throw new NotFoundException("Assigned user not found");
+    }
+  }
   const task = new TaskModel({
     title: data.title,
     description: data.description || null,
