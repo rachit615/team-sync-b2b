@@ -96,11 +96,26 @@ export const getAllTasksController = asyncHandler(
   async (req: Request, res: Response) => {
     const { workspaceId } = req.params;
 
+    const filters = {
+      projectId: req.query.projectId as string | undefined,
+      status: req.query.status
+        ? (req.query.status as string)?.split(",")
+        : undefined,
+      priority: req.query.priority
+        ? (req.query.priority as string)?.split(",")
+        : undefined,
+      assignedTo: req.query.assignedTo
+        ? (req.query.assignedTo as string)?.split(",")
+        : undefined,
+      keyword: req.query.keyword as string | undefined,
+      dueDate: req.query.dueDate as string | undefined,
+    };
+
     if (!mongoose.Types.ObjectId.isValid(workspaceId)) {
       throw new NotFoundException("Invalid workspace ID");
     }
 
-    const tasks = await getAllTasksService(workspaceId);
+    const tasks = await getAllTasksService(workspaceId, filters);
     return res.status(HTTP_STATUS.OK).json({ tasks });
   }
 );

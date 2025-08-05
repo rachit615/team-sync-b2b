@@ -74,11 +74,44 @@ export const deleteTaskService = async (
   }
 };
 
-export const getAllTasksService = async (workspaceId: string) => {
-  return TaskModel.find({ workspace: workspaceId })
+export const getAllTasksService = async (
+  workspaceId: string,
+  filters: {
+    projectId?: string;
+    status?: string[];
+    priority?: string[];
+    assignedTo?: string[];
+    keyword?: string;
+    dueDate?: string;
+  }
+) => {
+  const query: Record<string, any> = { workspace: workspaceId };
+
+  if (filters.projectId) {
+    query.project = filters.projectId;
+  }
+  if (filters.status) {
+    query.status = { $in: filters.status };
+  }
+  if (filters.priority) {
+    query.priority = { $in: filters.priority };
+  }
+  if (filters.assignedTo) {
+    query.assignedTo = { $in: filters.assignedTo };
+  }
+  if (filters.keyword && filters.keyword !== undefined) {
+    query.title = { $regex: filters.keyword, $options: "i" };
+  }
+  if (filters.dueDate) {
+    query.dueDate = {
+      $eq: new Date(filters.dueDate),
+    };
+  }
+
+  return TaskModel.find(query)
     .sort({ createdAt: -1 })
-    .populate("assignedTo", "name email")
-    .populate("createdBy", "name email")
+    .populate("assignedTo", "name email -password")
+    .populate("createdBy", "name email -password")
     .populate("project", "name");
 };
 
