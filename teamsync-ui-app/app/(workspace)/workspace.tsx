@@ -42,6 +42,12 @@ export default function WorkspaceScreen() {
             style={[styles.memberAvatar]}
           />
           <Text style={styles.headerTitle}>Your Workspace’s</Text>
+          <Ionicons
+            name={"notifications-outline"}
+            size={24}
+            color="#292A2D"
+            onPress={() => router.push("/(notifications)/notifications")}
+          />
           <Entypo name="menu" size={22} />
         </View>
 
