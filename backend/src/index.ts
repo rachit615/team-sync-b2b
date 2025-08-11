@@ -8,6 +8,7 @@ import { HTTP_STATUS } from "./config/http.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import passport from "passport";
+import http from "http";
 
 import "./config/passport.config";
 import authRoutes from "./routes/auth.route";
@@ -16,6 +17,8 @@ import workspaceRoutes from "./routes/workspace.route";
 import projectRoutes from "./routes/project.route";
 import { authenticateJWT } from "./middlewares/auth.middleware";
 import taskRoutes from "./routes/task.route";
+import notificationRoutes from "./routes/notification.route";
+import { initSocket } from "./sockets/socket"; // <-- ensure this file exists and exports initSocket
 
 dotenv.config();
 
@@ -53,13 +56,28 @@ app.use(`${BASE_PATH}/member`, memberRoutes);
 app.use(`${BASE_PATH}/workspace`, workspaceRoutes);
 app.use(`${BASE_PATH}/project`, authenticateJWT, projectRoutes);
 app.use(`${BASE_PATH}/task`, authenticateJWT, taskRoutes);
+app.use(`${BASE_PATH}/notifications`, notificationRoutes);
 
 // errorHandler middleware to be placed after all routes
 app.use(errorHandler);
 
-app.listen(config.PORT, async () => {
-  console.log(
-    `Server is running on port ${config.PORT} in ${config.NODE_ENV} mode`
-  );
-  await connectDB();
-});
+const server = http.createServer(app);
+const io = initSocket(server);
+console.log("Socket.IO initialized");
+
+// Start DB connection then start listening
+(async () => {
+  try {
+    await connectDB();
+    server.listen(config.PORT, () => {
+      console.log(
+        `Server is running on port ${config.PORT} in ${config.NODE_ENV} mode`
+      );
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err);
+    process.exit(1);
+  }
+})();
+
+export default server;
