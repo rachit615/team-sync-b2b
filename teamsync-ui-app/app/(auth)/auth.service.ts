@@ -10,4 +10,12 @@ export const AuthService = {
   logOutUser() {
     return DataService.post("/auth/logout");
   },
+  verifyToken(token: string | null) {
+    return DataService.post("/auth/validate-token", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  },
 };

@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-
+import { AuthService } from "../(auth)/auth.service";
 export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
@@ -11,11 +11,14 @@ export default function HomeScreen() {
     const checkLoginStatus = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        if (token) {
+        const data = await AuthService.verifyToken(token);
+        if (data.isValid) {
           router.replace("/(workspace)/workspace");
         }
       } catch (err) {
         console.error("Error checking token:", err);
+        await AsyncStorage.removeItem("token");
+        router.replace("/(auth)/login");
       } finally {
         setLoading(false);
       }
