@@ -6,7 +6,9 @@ import {
   loginController,
   logOutController,
   registerUserController,
+  validateTokenController,
 } from "../controllers/auth.controller";
+import { authenticateJWT } from "../middlewares/auth.middleware";
 
 const failedUrl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`;
 
@@ -16,6 +18,7 @@ authRoutes.post("/register", registerUserController);
 authRoutes.post("/login", loginController);
 
 authRoutes.post("/logout", logOutController);
+authRoutes.post("/validate-token", authenticateJWT, validateTokenController);
 
 authRoutes.get(
   "/google",

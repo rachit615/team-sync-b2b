@@ -83,3 +83,13 @@ export const logOutController = asyncHandler(
       .json({ message: "Logged out successfully" });
   }
 );
+
+export const validateTokenController = asyncHandler(
+  async (req: Request, res: Response) => {
+    return res.status(200).json({
+      message: "Token is valid",
+      user: req.user,
+      isValid: true,
+    });
+  }
+);

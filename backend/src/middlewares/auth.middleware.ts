@@ -17,7 +17,7 @@ export const authenticateJWT = (
       next();
       return;
     } catch (err) {
-      res.status(403).json({ message: "Invalid token" });
+      res.status(403).json({ message: "Invalid token", isValid: false });
       return;
     }
   }
