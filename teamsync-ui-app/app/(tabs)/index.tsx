@@ -4,8 +4,16 @@ import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { AuthService } from "../(auth)/auth.service";
+import socketsService from "../services/socketService";
+import { useDispatch } from "react-redux";
+import {
+  attachNotificationSocketHandlers,
+  loadInitial,
+} from "../store/notificationsSlice";
+
 export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -26,6 +34,15 @@ export default function HomeScreen() {
 
     checkLoginStatus();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      // initialising socket service on app load first time
+      await socketsService.initializeSocket();
+      dispatch(attachNotificationSocketHandlers() as any);
+      dispatch(loadInitial() as any);
+    })();
+  }, [dispatch]);
 
   if (loading) {
     return (

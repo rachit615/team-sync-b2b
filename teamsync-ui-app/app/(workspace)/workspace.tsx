@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 export default function WorkspaceScreen() {
   const getStatusBG = (taskStatus: string) => {
@@ -31,6 +33,11 @@ export default function WorkspaceScreen() {
       color: color,
     };
   };
+
+  const unreadCount = useSelector(
+    (s: RootState) => s.notifications.unreadCount
+  );
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -42,16 +49,41 @@ export default function WorkspaceScreen() {
             style={[styles.memberAvatar]}
           />
           <Text style={styles.headerTitle}>Your Workspace’s</Text>
-          <Ionicons
-            name={"notifications-outline"}
-            size={24}
-            color="#292A2D"
+          <TouchableOpacity
             onPress={() => router.push("/(notifications)/notifications")}
-          />
+            style={{ position: "relative" }}
+          >
+            <Ionicons
+              name={"notifications-outline"}
+              size={24}
+              color="#292A2D"
+            />
+            {unreadCount > 0 && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: -6,
+                  right: -6,
+                  backgroundColor: "#FF3B30",
+                  borderRadius: 8,
+                  minWidth: 16,
+                  height: 16,
+                  paddingHorizontal: 3,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontSize: 10, fontWeight: "700" }}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
           <Entypo name="menu" size={22} />
         </View>
 
-        {/* Tabs */}
         <ScrollView
           style={styles.tabs}
           horizontal
