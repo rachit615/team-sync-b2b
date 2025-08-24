@@ -1,6 +1,7 @@
 import TaskModel from "../models/task.model";
 import UserModel from "../models/user.model";
 import { NotFoundException } from "../utils/appError";
+import { createNotificationService } from "./notification.service";
 
 interface CreateTaskInput {
   title: string;
@@ -34,6 +35,16 @@ export const createTaskService = async (data: CreateTaskInput) => {
   });
 
   await task.save();
+  if (task.assignedTo) {
+    await createNotificationService({
+      userId: task.assignedTo.toString(),
+      title: "New task assigned",
+      message: `You have been assigned: ${task.title}`,
+      type: "TASK_ASSIGNED",
+      link: `/tasks/${task._id}`,
+    });
+  }
+
   return task;
 };
 
