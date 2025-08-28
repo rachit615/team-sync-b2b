@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { useEffect } from "react";
 
 export default function WorkspaceScreen() {
   const getStatusBG = (taskStatus: string) => {
@@ -38,6 +39,9 @@ export default function WorkspaceScreen() {
     (s: RootState) => s.notifications.unreadCount
   );
 
+  useEffect(() => {
+    router.replace("/(home)/homeScreen");
+  }, []);
   return (
     <ScrollView>
       <View style={styles.container}>
